@@ -42,6 +42,11 @@
                     <i class="bi bi-ticket-perforated me-2"></i>الكوبونات
                 </a>
 
+                <a href="{{ route('admin.reviews.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                    <i class="bi bi-star me-2"></i>التقييمات
+                </a>
+
                 <a href="{{ route('admin.orders.index') }}"
                     class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"><i
                         class="bi bi-receipt me-2"></i>الطلبات</a>
