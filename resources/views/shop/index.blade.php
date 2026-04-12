@@ -167,7 +167,9 @@
         <div class="row g-4">
             @foreach($products as $product)
             <div class="col-xl-4 col-md-6">
-                <div class="card product-card shadow-sm h-100">
+                <div class="card product-card shadow-sm h-100"
+                     onclick="window.location='{{ route('shop.show', $product) }}'"
+                     style="cursor:pointer">
                     @if($product->image)
                         <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}">
                     @else
@@ -175,6 +177,18 @@
                     @endif
 
                     <div class="card-body d-flex flex-column">
+                        {{-- زر المفضلة --}}
+                        @auth
+                        <form action="{{ route('wishlist.toggle', $product) }}"
+                              method="POST" class="d-inline"
+                              onclick="event.stopPropagation()">
+                            @csrf
+                            <button class="btn btn-sm {{ auth()->user()->hasInWishlist($product->id) ? 'btn-danger' : 'btn-outline-danger' }} float-start mb-2">
+                                <i class="bi bi-heart{{ auth()->user()->hasInWishlist($product->id) ? '-fill' : '' }}"></i>
+                            </button>
+                        </form>
+                        @endauth
+
                         {{-- التصنيف --}}
                         @if($product->category)
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2" style="width:fit-content">

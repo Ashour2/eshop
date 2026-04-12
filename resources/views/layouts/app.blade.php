@@ -39,6 +39,21 @@
                     السلة
                 </a>
 
+                {{-- أضف هذا بعد زر السلة مباشرة --}}
+@auth
+    @if(!auth()->user()->is_admin)
+    <a href="{{ route('wishlist.index') }}" class="btn btn-outline-light btn-sm position-relative">
+        <i class="bi bi-heart"></i>
+        @if(auth()->user()->wishlistCount() > 0)
+            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
+                {{ auth()->user()->wishlistCount() }}
+            </span>
+        @endif
+        المفضلة
+    </a>
+    @endif
+@endauth
+
                 @auth
                     @if(auth()->user()->is_admin)
                         {{-- أدمن --}}
