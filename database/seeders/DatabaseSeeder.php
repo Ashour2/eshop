@@ -7,8 +7,9 @@ class DatabaseSeeder extends Seeder {
     public function run(): void {
         $this->call([
             UserSeeder::class,
-            CategorySeeder::class, // ← لازم قبل ProductSeeder
+            CategorySeeder::class,
             ProductSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 }

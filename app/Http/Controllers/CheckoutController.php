@@ -1,25 +1,18 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\{Order, OrderItem, Product};
+use App\Models\{Order, OrderItem, Product, Coupon};
 use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
-    // public function __construct() {
-    //     $this->middleware('auth')->only(['index', 'store']);
-    // }
-
     public function index() {
         $cart = session('cart', []);
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'السلة فارغة');
         }
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-
-        // تعبئة البيانات من حساب المستخدم تلقائياً
-        $user = auth()->user();
-
+        $user  = auth()->user();
         return view('checkout.index', compact('cart', 'total', 'user'));
     }
 
@@ -28,24 +21,36 @@ class CheckoutController extends Controller
             'name'    => 'required|string|max:255',
             'email'   => 'required|email',
             'address' => 'required|string',
-        ], [
-            'name.required'    => 'الاسم مطلوب',
-            'email.required'   => 'البريد الإلكتروني مطلوب',
-            'email.email'      => 'صيغة البريد الإلكتروني غير صحيحة',
-            'address.required' => 'العنوان مطلوب',
         ]);
 
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('shop.index');
 
-        $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+        $subtotal = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+        $discount = 0;
+        $couponCode = null;
+
+        // ── تطبيق الكوبون إذا موجود ──────────────────────
+        if ($request->filled('coupon_code')) {
+            $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+            if ($coupon && $coupon->isValid($subtotal)['valid']) {
+                $discount   = $coupon->calcDiscount($subtotal);
+                $couponCode = $coupon->code;
+                // زيادة عداد الاستخدام
+                $coupon->increment('used_count');
+            }
+        }
+
+        $total = max(0, $subtotal - $discount);
 
         $order = Order::create([
-            'user_id'          => auth()->id(),   // ← ربط بالمستخدم
+            'user_id'          => auth()->id(),
             'customer_name'    => $request->name,
             'customer_email'   => $request->email,
             'customer_address' => $request->address,
             'total'            => $total,
+            'discount'         => $discount,
+            'coupon_code'      => $couponCode,
             'status'           => 'pending',
         ]);
 

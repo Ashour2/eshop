@@ -3,14 +3,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model {
+class Order extends Model
+{
     protected $fillable = [
         'user_id',
         'customer_name',
         'customer_email',
         'customer_address',
         'total',
-        'status'
+        'status',
+        'coupon_code',
+        'discount',
     ];
 
     public function items() {
