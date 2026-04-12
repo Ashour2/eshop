@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // ─── المتجر ───────────────────────────────────────────────
@@ -69,12 +70,20 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
 // ─── لوحة التحكم (Admin) ──────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::resource('products', ProductController::class);
     Route::resource('coupons', AdminCouponController::class);
+
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
+
     Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
     Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::patch('reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
+
+    // الإشعارات
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::delete('notifications/clear', [NotificationController::class, 'clearAll'])->name('notifications.clear');
 });

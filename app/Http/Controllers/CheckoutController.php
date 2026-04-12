@@ -1,8 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\{Order, OrderItem, Product, Coupon};
+use App\Mail\{OrderConfirmed, NewOrderAlert};
+use App\Models\{Order, OrderItem, Product, Coupon, User};
+use App\Notifications\{NewOrderNotification, LowStockNotification};
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -26,23 +29,23 @@ class CheckoutController extends Controller
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('shop.index');
 
-        $subtotal = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        $discount = 0;
+        $subtotal   = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+        $discount   = 0;
         $couponCode = null;
 
-        // ── تطبيق الكوبون إذا موجود ──────────────────────
+        // ── تطبيق الكوبون ────────────────────────────────
         if ($request->filled('coupon_code')) {
             $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
             if ($coupon && $coupon->isValid($subtotal)['valid']) {
                 $discount   = $coupon->calcDiscount($subtotal);
                 $couponCode = $coupon->code;
-                // زيادة عداد الاستخدام
                 $coupon->increment('used_count');
             }
         }
 
         $total = max(0, $subtotal - $discount);
 
+        // ── إنشاء الطلب ──────────────────────────────────
         $order = Order::create([
             'user_id'          => auth()->id(),
             'customer_name'    => $request->name,
@@ -62,10 +65,35 @@ class CheckoutController extends Controller
                 'price'        => $item['price'],
                 'quantity'     => $item['quantity'],
             ]);
-            Product::where('id', $productId)->decrement('stock', $item['quantity']);
+
+            // تخفيض المخزون
+            $product = Product::find($productId);
+            if ($product) {
+                $product->decrement('stock', $item['quantity']);
+                $product->refresh();
+
+                // إشعار نفاد المخزون إذا باق 5 أو أقل
+                if ($product->stock <= 5) {
+                    $admins = User::where('is_admin', true)->get();
+                    foreach ($admins as $admin) {
+                        $admin->notify(new LowStockNotification($product));
+                    }
+                }
+            }
         }
 
         session()->forget('cart');
+        $order->load('items');
+
+        // ── إرسال الإيميلات ───────────────────────────────
+        // Mail::to($order->customer_email)->send(new OrderConfirmed($order));
+        // Mail::to(config('mail.admin_email', env('ADMIN_EMAIL')))->send(new NewOrderAlert($order));
+
+        // ── إشعار الأدمن في الداشبورد ────────────────────
+        $admins = User::where('is_admin', true)->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewOrderNotification($order));
+        }
 
         return redirect()->route('checkout.success', $order->id);
     }

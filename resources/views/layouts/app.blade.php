@@ -39,31 +39,30 @@
                     السلة
                 </a>
 
-                {{-- أضف هذا بعد زر السلة مباشرة --}}
-@auth
-    @if(!auth()->user()->is_admin)
-    <a href="{{ route('wishlist.index') }}" class="btn btn-outline-light btn-sm position-relative">
-        <i class="bi bi-heart"></i>
-        @if(auth()->user()->wishlistCount() > 0)
-            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
-                {{ auth()->user()->wishlistCount() }}
-            </span>
-        @endif
-        المفضلة
-    </a>
-    @endif
-@endauth
+                {{-- المفضلة --}}
+                @auth
+                    @if(!auth()->user()->is_admin)
+                    <a href="{{ route('wishlist.index') }}" class="btn btn-outline-light btn-sm position-relative">
+                        <i class="bi bi-heart"></i>
+                        @if(auth()->user()->wishlistCount() > 0)
+                            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
+                                {{ auth()->user()->wishlistCount() }}
+                            </span>
+                        @endif
+                        المفضلة
+                    </a>
+                    @endif
+                @endauth
 
                 @auth
                     @if(auth()->user()->is_admin)
-                        {{-- أدمن --}}
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm">
                             <i class="bi bi-speedometer2"></i> لوحة التحكم
                         </a>
                     @else
-                        {{-- مستخدم عادي --}}
                         <div class="dropdown">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle"></i>
                                 {{ auth()->user()->name }}
                             </button>
@@ -76,6 +75,11 @@
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.orders') }}">
                                         <i class="bi bi-receipt me-2"></i> طلباتي
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('wishlist.index') }}">
+                                        <i class="bi bi-heart me-2"></i> مفضلتي
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
@@ -129,10 +133,27 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
+
+<script>
+// ── حفظ واستعادة موضع الصفحة ─────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+
+    // استعادة الموضع بعد الـ reload
+    const scrollPos = sessionStorage.getItem('scrollPos');
+    if (scrollPos) {
+        window.scrollTo({ top: parseInt(scrollPos), behavior: 'instant' });
+        sessionStorage.removeItem('scrollPos');
+    }
+
+    // حفظ الموضع عند أي submit
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function () {
+            sessionStorage.setItem('scrollPos', window.scrollY);
+        });
+    });
+
+});
+</script>
+
 </body>
 </html>
-{{-- في <head> قبل إغلاق </head> أضف هذا السطر --}}
-{{-- @stack('styles') --}}
-
-{{-- قبل إغلاق </body> أضف هذا السطر --}}
-{{-- @stack('scripts') --}}
