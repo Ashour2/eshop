@@ -1,17 +1,26 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Product;
+use App\Models\{Order, OrderItem, Product};
 use Illuminate\Http\Request;
 
-class CheckoutController extends Controller {
+class CheckoutController extends Controller
+{
+    // public function __construct() {
+    //     $this->middleware('auth')->only(['index', 'store']);
+    // }
+
     public function index() {
         $cart = session('cart', []);
-        if (empty($cart)) return redirect()->route('cart.index')->with('error', 'السلة فارغة');
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'السلة فارغة');
+        }
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        return view('checkout.index', compact('cart', 'total'));
+
+        // تعبئة البيانات من حساب المستخدم تلقائياً
+        $user = auth()->user();
+
+        return view('checkout.index', compact('cart', 'total', 'user'));
     }
 
     public function store(Request $request) {
@@ -19,6 +28,11 @@ class CheckoutController extends Controller {
             'name'    => 'required|string|max:255',
             'email'   => 'required|email',
             'address' => 'required|string',
+        ], [
+            'name.required'    => 'الاسم مطلوب',
+            'email.required'   => 'البريد الإلكتروني مطلوب',
+            'email.email'      => 'صيغة البريد الإلكتروني غير صحيحة',
+            'address.required' => 'العنوان مطلوب',
         ]);
 
         $cart = session('cart', []);
@@ -27,6 +41,7 @@ class CheckoutController extends Controller {
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
 
         $order = Order::create([
+            'user_id'          => auth()->id(),   // ← ربط بالمستخدم
             'customer_name'    => $request->name,
             'customer_email'   => $request->email,
             'customer_address' => $request->address,
@@ -42,11 +57,11 @@ class CheckoutController extends Controller {
                 'price'        => $item['price'],
                 'quantity'     => $item['quantity'],
             ]);
-            // تخفيض المخزون
             Product::where('id', $productId)->decrement('stock', $item['quantity']);
         }
 
         session()->forget('cart');
+
         return redirect()->route('checkout.success', $order->id);
     }
 
