@@ -74,9 +74,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('products', ProductController::class);
     Route::resource('coupons', AdminCouponController::class);
 
+
+
+
+    Route::get('orders/export/excel', [OrderController::class, 'exportExcel'])->name('orders.export.excel');
+    Route::get('orders/export/pdf',   [OrderController::class, 'exportPdf'])->name('orders.export.pdf');
+
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
+
 
     Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
     Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
