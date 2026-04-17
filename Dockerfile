@@ -3,7 +3,8 @@ FROM php:8.2-cli
 # تثبيت المكتبات المطلوبة
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring xml zip gd \
+    libonig-dev libcurl4-openssl-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring xml zip gd curl \
     && apt-get clean
 
 # تثبيت Composer
