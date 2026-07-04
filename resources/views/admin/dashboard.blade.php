@@ -3,11 +3,11 @@
 
 @push('styles')
 <style>
-    .stat-card { border: none; border-radius: 16px; transition: transform .2s; }
-    .stat-card:hover { transform: translateY(-4px); }
+    .stat-card { border-radius: 16px; transition: transform .2s; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(232,97,26,.1) !important; }
     .stat-icon { width: 56px; height: 56px; border-radius: 14px;
         display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .chart-card { border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+    .chart-card { border-radius: 16px; }
 </style>
 @endpush
 
@@ -33,8 +33,8 @@
          'icon'=>'bi-cash-stack',    'color'=>'success',  'sub'=>'$'.number_format($stats['today_revenue'],2).' اليوم'],
         ['label'=>'الطلبات',          'val'=>$stats['orders'],
          'icon'=>'bi-receipt',       'color'=>'primary',  'sub'=>$stats['pending_orders'].' قيد الانتظار'],
-        ['label'=>'المنتجات',         'val'=>$stats['products'],
-         'icon'=>'bi-box-seam',      'color'=>'warning',  'sub'=>'منتج في المتجر'],
+        ['label'=>'الخدمات',         'val'=>$stats['products'],
+         'icon'=>'bi-box-seam',      'color'=>'warning',  'sub'=>'خدمة في المتجر'],
         ['label'=>'العملاء',          'val'=>$stats['customers'],
          'icon'=>'bi-people',        'color'=>'info',     'sub'=>'مستخدم مسجّل'],
     ];
@@ -68,7 +68,7 @@
                     <div class="d-flex gap-3">
                         <small class="text-muted">
                             <span class="d-inline-block rounded-circle me-1"
-                                  style="width:10px;height:10px;background:#0d6efd"></span>
+                                  style="width:10px;height:10px;background:#e8611a"></span>
                             الإيرادات
                         </small>
                         <small class="text-muted">
@@ -87,11 +87,11 @@
 {{-- ══ Chart 2 + 3 ═════════════════════════════════════ --}}
 <div class="row g-4 mb-4">
 
-    {{-- أكثر المنتجات مبيعاً --}}
+    {{-- أكثر الخدمات مبيعاً --}}
     <div class="col-lg-7">
         <div class="card chart-card h-100">
             <div class="card-body p-4">
-                <h6 class="fw-bold mb-3">🏆 أكثر المنتجات مبيعاً</h6>
+                <h6 class="fw-bold mb-3">🏆 أكثر الخدمات مبيعاً</h6>
                 @if(count($topProductLabels) > 0)
                     <canvas id="topProductsChart" height="220"></canvas>
                 @else
@@ -196,7 +196,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 Chart.defaults.font.family = 'system-ui, sans-serif';
-Chart.defaults.color = '#6c757d';
+Chart.defaults.color = '#a0a8c8';
 
 // ── بيانات من PHP ──────────────────────────────────────
 const salesLabels       = @json($salesLabels);
@@ -219,8 +219,8 @@ new Chart(document.getElementById('salesChart'), {
             {
                 label: 'الإيرادات ($)',
                 data: salesTotals,
-                borderColor: '#0d6efd',
-                backgroundColor: 'rgba(13,110,253,.08)',
+                borderColor: '#e8611a',
+                backgroundColor: 'rgba(232,97,26,.1)',
                 borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
@@ -246,7 +246,7 @@ new Chart(document.getElementById('salesChart'), {
         interaction: { mode: 'index', intersect: false },
         plugins: { legend: { display: false } },
         scales: {
-            y:  { position: 'right', grid: { color: '#f0f0f0' },
+            y:  { position: 'right', grid: { color: 'rgba(255,255,255,.06)' },
                   ticks: { callback: v => '$' + v.toLocaleString() } },
             y1: { position: 'left',  grid: { drawOnChartArea: false },
                   ticks: { stepSize: 1 } },
@@ -255,7 +255,7 @@ new Chart(document.getElementById('salesChart'), {
     }
 });
 
-// ── Chart 2: أكثر المنتجات مبيعاً ─────────────────────
+// ── Chart 2: أكثر الخدمات مبيعاً ─────────────────────
 if (topProductLabels.length > 0) {
     const barColors = [
         '#0d6efd','#6610f2','#6f42c1','#d63384',
@@ -277,7 +277,7 @@ if (topProductLabels.length > 0) {
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-                y: { grid: { color: '#f0f0f0' }, ticks: { stepSize: 1 } },
+                y: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { stepSize: 1 } },
                 x: { grid: { display: false },
                      ticks: { maxRotation: 30,
                               callback: function(val, i) {
@@ -323,8 +323,8 @@ new Chart(document.getElementById('monthlyChart'), {
         datasets: [{
             label: 'الإيرادات ($)',
             data: monthlyTotals,
-            backgroundColor: 'rgba(13,110,253,.15)',
-            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(232,97,26,.15)',
+            borderColor: '#e8611a',
             borderWidth: 2,
             borderRadius: 10,
             borderSkipped: false,
@@ -334,7 +334,7 @@ new Chart(document.getElementById('monthlyChart'), {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-            y: { grid: { color: '#f0f0f0' },
+            y: { grid: { color: 'rgba(255,255,255,.06)' },
                  ticks: { callback: v => '$' + v.toLocaleString() } },
             x: { grid: { display: false } }
         }

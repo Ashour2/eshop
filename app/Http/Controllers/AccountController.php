@@ -27,9 +27,9 @@ class AccountController extends Controller
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
         ], [
-            'name.required'  => 'الاسم مطلوب',
-            'email.required' => 'البريد الإلكتروني مطلوب',
-            'email.unique'   => 'البريد الإلكتروني مستخدم من حساب آخر',
+            'name.required'  => __('shop.val_name_required'),
+            'email.required' => __('shop.val_email_required'),
+            'email.unique'   => __('shop.val_email_unique_account'),
         ]);
 
         $user->update([
@@ -37,7 +37,7 @@ class AccountController extends Controller
             'email' => $request->email,
         ]);
 
-        return back()->with('success', 'تم تحديث بياناتك بنجاح');
+        return back()->with('success', __('shop.profile_updated'));
     }
 
     // ── تغيير كلمة المرور ────────────────────────────────
@@ -46,20 +46,20 @@ class AccountController extends Controller
             'current_password' => 'required',
             'password'         => 'required|min:8|confirmed',
         ], [
-            'current_password.required' => 'كلمة المرور الحالية مطلوبة',
-            'password.min'              => 'كلمة المرور الجديدة 8 أحرف على الأقل',
-            'password.confirmed'        => 'كلمتا المرور غير متطابقتين',
+            'current_password.required' => __('shop.val_current_password_required'),
+            'password.min'              => __('shop.val_password_min'),
+            'password.confirmed'        => __('shop.val_password_confirmed'),
         ]);
 
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'كلمة المرور الحالية غير صحيحة']);
+            return back()->withErrors(['current_password' => __('shop.val_current_password_wrong')]);
         }
 
         $user->update(['password' => Hash::make($request->password)]);
 
-        return back()->with('success', 'تم تغيير كلمة المرور بنجاح');
+        return back()->with('success', __('shop.password_changed'));
     }
 
     // ── طلباتي ───────────────────────────────────────────

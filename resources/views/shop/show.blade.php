@@ -2,24 +2,9 @@
 @section('title', $product->name)
 @section('content')
 
-{{-- ══ تفاصيل المنتج ══════════════════════════════════════ --}}
 <div class="row g-5 mb-5">
 
-    {{-- الصورة --}}
-    <div class="col-md-5">
-        @if($product->image)
-            <img src="{{ $product->image_url }}"
-                 class="img-fluid rounded-4 shadow-sm w-100"
-                 style="max-height:400px;object-fit:cover"
-                 alt="{{ $product->name }}">
-        @else
-            <div class="bg-light rounded-4 d-flex align-items-center justify-content-center"
-                 style="height:400px;font-size:5rem">🖥️</div>
-        @endif
-    </div>
-
-    {{-- البيانات --}}
-    <div class="col-md-7">
+    <div class="col-md-8 mx-auto">
         @if($product->category)
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2">
             <i class="bi {{ $product->category->icon }}"></i> {{ $product->category->name }}
@@ -28,45 +13,37 @@
 
         <h2 class="fw-bold mb-2">{{ $product->name }}</h2>
 
-        {{-- التقييم --}}
         <div class="d-flex align-items-center gap-2 mb-3">
             <span>{!! $product->stars_html !!}</span>
             <span class="fw-bold">{{ $product->avg_rating }}</span>
-            <span class="text-muted">({{ $product->reviews_count }} تقييم)</span>
+            <span class="text-muted">({{ $product->reviews_count }} {{ __('shop.reviews_label') }})</span>
         </div>
 
         <p class="text-muted mb-4" style="line-height:1.9">{{ $product->description }}</p>
 
         <div class="d-flex align-items-center gap-3 mb-4">
-            <span class="fs-2 fw-bold text-success">${{ number_format($product->price, 2) }}</span>
-            @if($product->stock > 0)
-                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
-                    ✅ متوفر ({{ $product->stock }} قطعة)
-                </span>
-            @else
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
-                    ❌ نفد المخزون
-                </span>
-            @endif
+            <div>
+                <div class="text-muted small mb-1">{{ __('shop.starts_from') }}</div>
+                <span class="fs-2 fw-bold text-success">${{ number_format($product->price, 2) }}</span>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                ✅ {{ __('shop.available') }}
+            </span>
         </div>
 
-        @if($product->stock > 0)
         <form action="{{ route('cart.add', $product) }}" method="POST">
             @csrf
             <button class="btn btn-primary btn-lg px-5">
-                <i class="bi bi-cart-plus"></i> أضف للسلة
+                <i class="bi bi-cart-plus"></i> {{ __('shop.add_to_cart') }}
             </button>
         </form>
-        @endif
     </div>
 </div>
 
-{{-- ══ التقييمات ══════════════════════════════════════════ --}}
 <div class="row g-4">
 
-    {{-- قائمة التقييمات --}}
     <div class="col-lg-8">
-        <h4 class="fw-bold mb-4">⭐ آراء العملاء ({{ $product->reviews_count }})</h4>
+        <h4 class="fw-bold mb-4">⭐ {{ __('shop.customer_reviews') }} ({{ $product->reviews_count }})</h4>
 
         @forelse($product->reviews as $review)
         <div class="card border-0 shadow-sm rounded-4 mb-3">
@@ -91,7 +68,7 @@
                         @auth
                             @if(auth()->id() === $review->user_id)
                             <form action="{{ route('reviews.destroy', $review) }}" method="POST"
-                                  onsubmit="return confirm('حذف التقييم؟')">
+                                  onsubmit="return confirm('{{ __('shop.delete_review_confirm') }}')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash"></i>
@@ -109,16 +86,15 @@
         @empty
         <div class="text-center py-4 text-muted">
             <i class="bi bi-chat-square-text" style="font-size:3rem;opacity:.3"></i>
-            <p class="mt-2">لا توجد تقييمات بعد — كن أول من يقيّم!</p>
+            <p class="mt-2">{{ __('shop.no_reviews_yet') }}</p>
         </div>
         @endforelse
     </div>
 
-    {{-- فورم التقييم --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top:20px">
             <div class="card-body p-4">
-                <h5 class="fw-bold mb-4">✍️ أضف تقييمك</h5>
+                <h5 class="fw-bold mb-4">✍️ {{ __('shop.add_your_review') }}</h5>
 
                 @auth
                     @php
@@ -131,22 +107,21 @@
                     @if($userReview)
                         <div class="alert alert-success">
                             <i class="bi bi-check-circle me-2"></i>
-                            لقد قيّمت هذا المنتج بـ {{ $userReview->rating }} نجوم
+                            {{ __('shop.already_reviewed', ['rating' => $userReview->rating]) }}
                         </div>
                     @elseif(!$purchased)
                         <div class="alert alert-warning">
                             <i class="bi bi-bag me-2"></i>
-                            يجب شراء المنتج أولاً لتتمكن من التقييم
+                            {{ __('shop.must_purchase') }}
                         </div>
                         <a href="{{ route('cart.add', $product) }}"
-                           class="btn btn-primary w-100">اشتره الآن</a>
+                           class="btn btn-primary w-100">{{ __('shop.buy_now') }}</a>
                     @else
                         <form action="{{ route('reviews.store', $product) }}" method="POST">
                             @csrf
 
-                            {{-- النجوم --}}
                             <div class="mb-3">
-                                <label class="form-label fw-bold">تقييمك</label>
+                                <label class="form-label fw-bold">{{ __('shop.your_rating') }}</label>
                                 <div class="d-flex gap-2 fs-2" id="starRating">
                                     @for($i = 1; $i <= 5; $i++)
                                     <i class="bi bi-star text-warning"
@@ -162,13 +137,13 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">تعليقك (اختياري)</label>
+                                <label class="form-label fw-bold">{{ __('shop.comment_optional') }}</label>
                                 <textarea name="comment" class="form-control" rows="4"
-                                          placeholder="شاركنا رأيك بالمنتج...">{{ old('comment') }}</textarea>
+                                          placeholder="{{ __('shop.share_opinion') }}">{{ old('comment') }}</textarea>
                             </div>
 
                             <button type="submit" class="btn btn-warning w-100 fw-bold">
-                                <i class="bi bi-send"></i> إرسال التقييم
+                                <i class="bi bi-send"></i> {{ __('shop.submit_review') }}
                             </button>
                         </form>
                     @endif
@@ -176,8 +151,8 @@
                 @else
                     <div class="text-center py-3">
                         <i class="bi bi-person-lock" style="font-size:2.5rem;color:#ccc"></i>
-                        <p class="text-muted mt-2">سجّل دخول لإضافة تقييم</p>
-                        <a href="{{ route('login') }}" class="btn btn-primary w-100">تسجيل الدخول</a>
+                        <p class="text-muted mt-2">{{ __('shop.login_to_review') }}</p>
+                        <a href="{{ route('login') }}" class="btn btn-primary w-100">{{ __('shop.login') }}</a>
                     </div>
                 @endauth
             </div>
@@ -199,7 +174,6 @@ function setRating(value) {
     });
 }
 
-// hover effect
 document.querySelectorAll('#starRating i').forEach((star, idx) => {
     star.addEventListener('mouseover', () => {
         document.querySelectorAll('#starRating i').forEach((s, i) => {

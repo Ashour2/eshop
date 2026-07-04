@@ -25,14 +25,9 @@ class Order extends Model
     }
 
     public function getStatusLabelAttribute(): string {
-        return match($this->status) {
-            'pending'    => 'قيد الانتظار',
-            'processing' => 'قيد المعالجة',
-            'shipped'    => 'تم الشحن',
-            'delivered'  => 'تم التسليم',
-            'cancelled'  => 'ملغي',
-            default      => $this->status,
-        };
+        $key = 'shop.status_' . $this->status;
+        $label = __($key);
+        return $label !== $key ? $label : $this->status;
     }
 
     public function getStatusColorAttribute(): string {

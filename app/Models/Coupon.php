@@ -16,38 +16,35 @@ class Coupon extends Model
         'active'     => 'boolean',
     ];
 
-    // ── حساب قيمة الخصم ──────────────────────────────────
     public function calcDiscount(float $total): float
     {
         if ($this->type === 'percentage') {
             return round($total * ($this->value / 100), 2);
         }
-        return min($this->value, $total); // لا يتجاوز إجمالي الطلب
+        return min($this->value, $total);
     }
 
-    // ── التحقق من صلاحية الكوبون ─────────────────────────
     public function isValid(float $total): array
     {
         if (!$this->active) {
-            return ['valid' => false, 'message' => 'هذا الكوبون غير مفعّل'];
+            return ['valid' => false, 'message' => __('shop.coupon_inactive')];
         }
         if ($this->expires_at && $this->expires_at->isPast()) {
-            return ['valid' => false, 'message' => 'انتهت صلاحية هذا الكوبون'];
+            return ['valid' => false, 'message' => __('shop.coupon_expired')];
         }
         if ($this->max_uses > 0 && $this->used_count >= $this->max_uses) {
-            return ['valid' => false, 'message' => 'تم استنفاد عدد استخدامات هذا الكوبون'];
+            return ['valid' => false, 'message' => __('shop.coupon_exhausted')];
         }
         if ($total < $this->min_order) {
-            return ['valid' => false, 'message' => 'الحد الأدنى للطلب هو $' . number_format($this->min_order, 2)];
+            return ['valid' => false, 'message' => __('shop.coupon_min_order', ['amount' => number_format($this->min_order, 2)])];
         }
-        return ['valid' => true, 'message' => 'تم تطبيق الكوبون بنجاح!'];
+        return ['valid' => true, 'message' => __('shop.coupon_applied')];
     }
 
-    // ── وصف نوع الخصم ────────────────────────────────────
     public function getDescriptionAttribute(): string
     {
         return $this->type === 'percentage'
-            ? "خصم {$this->value}%"
-            : "خصم $" . number_format($this->value, 2);
+            ? __('shop.coupon_desc_percent', ['value' => $this->value])
+            : __('shop.coupon_desc_fixed', ['value' => number_format($this->value, 2)]);
     }
 }

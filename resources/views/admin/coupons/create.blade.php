@@ -1,8 +1,8 @@
 @extends('layouts.admin')
-@section('title', 'إضافة كوبون')
+@section('title', 'إضافة خصم')
 @section('content')
 
-<h3 class="fw-bold mb-4">🎟️ إضافة كوبون جديد</h3>
+<h3 class="fw-bold mb-4">🎟️ إضافة خصم جديد</h3>
 
 <div class="card shadow-sm border-0 rounded-4">
 <div class="card-body p-4">
@@ -11,7 +11,7 @@
     <div class="row g-3">
 
         <div class="col-md-6">
-            <label class="form-label fw-bold">كود الكوبون</label>
+            <label class="form-label fw-bold">كود الخصم</label>
             <input type="text" name="code"
                    class="form-control text-uppercase @error('code') is-invalid @enderror"
                    value="{{ old('code') }}"
@@ -64,13 +64,13 @@
                 <input type="hidden" name="active" value="0">
                 <input type="checkbox" name="active" value="1"
                        class="form-check-input" id="active" checked>
-                <label class="form-check-label" for="active">كوبون مفعّل</label>
+                <label class="form-check-label" for="active">خصم مفعّل</label>
             </div>
         </div>
 
         <div class="col-12 d-flex gap-2">
             <button type="submit" class="btn btn-primary px-4">
-                <i class="bi bi-save"></i> حفظ الكوبون
+                <i class="bi bi-save"></i> حفظ الخصم
             </button>
             <a href="{{ route('admin.coupons.index') }}" class="btn btn-outline-secondary">إلغاء</a>
         </div>

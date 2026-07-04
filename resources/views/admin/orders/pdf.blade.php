@@ -85,7 +85,7 @@
             </td>
             <td>
                 @foreach($order->items as $item)
-                    {{ $item->product_name }} ×{{ $item->quantity }}<br>
+                    {{ $item->product_name }}<br>
                 @endforeach
             </td>
             <td>
@@ -106,7 +106,7 @@
 </table>
 
 <div class="footer">
-    <p>© {{ date('Y') }} متجرنا الإلكتروني — تقرير سري للاستخدام الداخلي فقط</p>
+    <p>© {{ date('Y') }} RoyaTech — تقرير سري للاستخدام الداخلي فقط</p>
 </div>
 
 </body>

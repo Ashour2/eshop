@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', 'مفضلتي')
+@section('title', __('shop.my_wishlist'))
 @section('content')
 
-<h3 class="fw-bold mb-4">❤️ مفضلتي ({{ $items->count() }})</h3>
+<h3 class="fw-bold mb-4">❤️ {{ __('shop.my_wishlist') }} ({{ $items->count() }})</h3>
 
 @forelse($items as $item)
 @php $product = $item->product; @endphp
@@ -10,21 +10,7 @@
     <div class="card-body p-4">
         <div class="row align-items-center g-3">
 
-            {{-- الصورة --}}
-            <div class="col-md-1 col-3">
-                @if($product->image)
-                    <img src="{{ $product->image_url }}"
-                         class="rounded-3 w-100"
-                         style="height:70px;object-fit:cover"
-                         alt="{{ $product->name }}">
-                @else
-                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center"
-                         style="height:70px;font-size:1.8rem">🖥️</div>
-                @endif
-            </div>
-
-            {{-- البيانات --}}
-            <div class="col-md-6 col-9">
+            <div class="col-md-7 col-9">
                 @if($product->category)
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-1" style="font-size:.75rem">
                     {{ $product->category->name }}
@@ -42,29 +28,21 @@
                 </div>
             </div>
 
-            {{-- السعر --}}
             <div class="col-md-2 text-center">
                 <div class="fs-5 fw-bold text-success">${{ number_format($product->price, 2) }}</div>
-                @if($product->stock > 0)
-                    <span class="badge bg-success-subtle text-success border border-success-subtle">متوفر</span>
-                @else
-                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">نفد</span>
-                @endif
+                <span class="badge bg-success-subtle text-success border border-success-subtle">{{ __('shop.available') }}</span>
             </div>
 
-            {{-- الأزرار --}}
             <div class="col-md-3 d-flex gap-2 justify-content-md-end">
-                @if($product->stock > 0)
                 <form action="{{ route('cart.add', $product) }}" method="POST">
                     @csrf
                     <button class="btn btn-primary btn-sm">
-                        <i class="bi bi-cart-plus"></i> أضف للسلة
+                        <i class="bi bi-cart-plus"></i> {{ __('shop.add_to_cart') }}
                     </button>
                 </form>
-                @endif
 
                 <form action="{{ route('wishlist.destroy', $item) }}" method="POST"
-                      onsubmit="return confirm('إزالة من المفضلة؟')">
+                      onsubmit="return confirm('{{ __('shop.remove_wishlist_confirm') }}')">
                     @csrf @method('DELETE')
                     <button class="btn btn-outline-danger btn-sm">
                         <i class="bi bi-heart-fill"></i>
@@ -78,9 +56,9 @@
 @empty
 <div class="text-center py-5">
     <i class="bi bi-heart" style="font-size:5rem;color:#ccc"></i>
-    <h5 class="mt-3 text-muted">قائمة المفضلة فارغة</h5>
-    <p class="text-muted">أضف منتجاتك المفضلة بالضغط على ❤️</p>
-    <a href="{{ route('shop.index') }}" class="btn btn-primary mt-2">تصفح المنتجات</a>
+    <h5 class="mt-3 text-muted">{{ __('shop.wishlist_empty') }}</h5>
+    <p class="text-muted">{{ __('shop.wishlist_hint') }}</p>
+    <a href="{{ route('shop.index') }}" class="btn btn-primary mt-2">{{ __('shop.browse_products') }}</a>
 </div>
 @endforelse
 

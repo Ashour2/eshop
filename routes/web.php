@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -9,10 +10,16 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\WalletRechargeController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use Illuminate\Support\Facades\Route;
 
 // ─── المتجر ───────────────────────────────────────────────
@@ -58,6 +65,13 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+// ─── المحفظة ──────────────────────────────────────────────
+Route::middleware('auth')->prefix('wallet')->name('wallet.')->group(function () {
+    Route::get('/',         [WalletController::class,         'index'])->name('index');
+    Route::post('/redeem',  [WalletController::class,         'redeem'])->name('redeem');
+    Route::post('/request', [WalletRechargeController::class, 'store'])->name('request');
+});
+
 // ─── حساب المستخدم ────────────────────────────────────────
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
     Route::get('/',                [AccountController::class, 'index'])->name('index');
@@ -67,11 +81,12 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
     Route::get('/orders/{id}',     [AccountController::class, 'orderShow'])->name('orders.show');
 });
 
-// ─── لوحة التحكم (Admin) ──────────────────────────────────
+// Admin dashboard by Ashour ghaben
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('products', ProductController::class);
+    Route::resource('categories', CategoryController::class)->except('show');
     Route::resource('coupons', AdminCouponController::class);
 
 
@@ -93,4 +108,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
     Route::delete('notifications/clear', [NotificationController::class, 'clearAll'])->name('notifications.clear');
+
+    // إعدادات الموقع
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // ─── المحفظة (أدمن) ──────────────────────────────────────
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        // أكواد الشحن
+        Route::get('codes',             [AdminWalletController::class, 'codes'])->name('codes');
+        Route::get('codes/generate',    [AdminWalletController::class, 'generateForm'])->name('generate-form');
+        Route::post('codes/generate',   [AdminWalletController::class, 'generate'])->name('generate');
+        Route::patch('codes/{code}/disable', [AdminWalletController::class, 'disable'])->name('disable');
+
+        // أرصدة المستخدمين
+        Route::get('users',                          [AdminWalletController::class, 'users'])->name('users');
+        Route::get('users/{user}/transactions',      [AdminWalletController::class, 'userTransactions'])->name('user-transactions');
+        Route::get('users/{user}/adjust',            [AdminWalletController::class, 'adjustForm'])->name('adjust-form');
+        Route::post('users/{user}/adjust',           [AdminWalletController::class, 'adjust'])->name('adjust');
+    });
 });
+// lang swich
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');

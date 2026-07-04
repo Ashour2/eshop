@@ -84,17 +84,15 @@
         <table class="products-table">
             <thead>
                 <tr>
-                    <th>المنتج</th>
-                    <th style="text-align:center">الكمية</th>
-                    <th style="text-align:left">الإجمالي</th>
+                    <th>الخدمة</th>
+                    <th style="text-align:left">السعر</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($order->items as $item)
                 <tr>
                     <td>{{ $item->product_name }}</td>
-                    <td style="text-align:center">{{ $item->quantity }}</td>
-                    <td style="text-align:left">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                    <td style="text-align:left">${{ number_format($item->price, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -118,7 +116,7 @@
     </div>
 
     <div class="footer">
-        <p>© {{ date('Y') }} متجرنا الإلكتروني — إشعار داخلي للأدمن</p>
+        <p>© {{ date('Y') }} RoyaTech — إشعار داخلي للأدمن</p>
     </div>
 
 </div>

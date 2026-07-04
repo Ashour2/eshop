@@ -25,10 +25,10 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard');
             }
             return redirect()->intended(route('shop.index'))
-                             ->with('success', 'مرحباً بك ' . Auth::user()->name . '!');
+                             ->with('success', __('shop.auth_welcome', ['name' => Auth::user()->name]));
         }
 
-        return back()->withErrors(['email' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة']);
+        return back()->withErrors(['email' => __('shop.auth_invalid_credentials')]);
     }
 
     // ── إنشاء حساب ───────────────────────────────────────
@@ -43,12 +43,12 @@ class AuthController extends Controller
             'password'              => 'required|min:8|confirmed',
             'password_confirmation' => 'required',
         ], [
-            'name.required'      => 'الاسم مطلوب',
-            'email.required'     => 'البريد الإلكتروني مطلوب',
-            'email.unique'       => 'البريد الإلكتروني مسجّل مسبقاً',
-            'password.required'  => 'كلمة المرور مطلوبة',
-            'password.min'       => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
-            'password.confirmed' => 'كلمتا المرور غير متطابقتين',
+            'name.required'      => __('shop.val_name_required'),
+            'email.required'     => __('shop.val_email_required'),
+            'email.unique'       => __('shop.val_email_unique'),
+            'password.required'  => __('shop.val_password_required'),
+            'password.min'       => __('shop.val_password_min'),
+            'password.confirmed' => __('shop.val_password_confirmed'),
         ]);
 
         $user = User::create([
@@ -62,7 +62,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route('shop.index')
-                         ->with('success', 'تم إنشاء حسابك بنجاح! مرحباً ' . $user->name);
+                         ->with('success', __('shop.auth_registered', ['name' => $user->name]));
     }
 
     // ── تسجيل الخروج ─────────────────────────────────────
@@ -71,6 +71,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('shop.index')
-                         ->with('success', 'تم تسجيل الخروج بنجاح');
+                         ->with('success', __('shop.auth_logout_success'));
     }
 }

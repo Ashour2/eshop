@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\{Product, Category};
+use App\Models\{Product, Category, Setting};
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -10,22 +10,18 @@ class ShopController extends Controller
     {
         $query = Product::where('active', true)->with('category');
 
-        // ── بحث بالاسم ──────────────────────────────
+        // ── بحث بالاسم (في اللغتين) ────────────────────
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name_ar', 'like', "%$search%")
+                  ->orWhere('name_en', 'like', "%$search%");
+            });
         }
 
         // ── فلتر بالتصنيف ────────────────────────────
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
-        }
-
-        // ── فلتر بالسعر ──────────────────────────────
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
         }
 
         // ── الترتيب ───────────────────────────────────
@@ -47,12 +43,16 @@ class ShopController extends Controller
         ];
 
         // السلايدر
-        $slides = [
-            ['title' => 'أحدث التقنيات بين يديك',    'subtitle' => 'اكتشف أفضل المنتجات الإلكترونية بأسعار لا تُقاوم',       'bg' => 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1400&q=80', 'btn' => 'تسوق الآن'],
-            ['title' => 'عروض حصرية لفترة محدودة',   'subtitle' => 'خصومات تصل إلى 40% على أحدث اللابتوبات والإكسسوارات',   'bg' => 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1400&q=80', 'btn' => 'اكتشف العروض'],
-            ['title' => 'سماعات تجربة صوت مختلفة',   'subtitle' => 'أفضل سماعات العالم بجودة استثنائية وراحة لا مثيل لها',   'bg' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1400&q=80', 'btn' => 'تسوق الآن'],
-            ['title' => 'إكسسوارات تُكمل إنتاجيتك', 'subtitle' => 'ماوس، كيبورد، وكل ما تحتاجه لمكتبك المثالي',             'bg' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=1400&q=80', 'btn' => 'تصفح المنتجات'],
-        ];
+        $locale    = app()->getLocale();
+        $rawSlides = json_decode(Setting::get('sliders', '[]'), true) ?? [];
+        $slides    = array_map(function ($s) use ($locale) {
+            return [
+                'title'    => $locale === 'ar' ? ($s['title_ar'] ?? '') : ($s['title_en'] ?? ''),
+                'subtitle' => $locale === 'ar' ? ($s['subtitle_ar'] ?? '') : ($s['subtitle_en'] ?? ''),
+                'bg'       => $s['bg'] ?? '',
+                'btn'      => __('shop.shop_now'),
+            ];
+        }, $rawSlides);
 
         return view('shop.index', compact('products', 'categories', 'stats', 'slides'));
     }

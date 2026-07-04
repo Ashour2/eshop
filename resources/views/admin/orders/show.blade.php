@@ -32,21 +32,19 @@
 
 <div class="col-md-7">
     <div class="card shadow-sm">
-        <div class="card-header fw-bold">المنتجات المطلوبة</div>
+        <div class="card-header fw-bold">الخدمات المطلوبة</div>
         <table class="table mb-0">
-            <thead><tr><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
+            <thead><tr><th>الخدمة</th><th>السعر</th></tr></thead>
             <tbody>
             @foreach($order->items as $item)
             <tr>
                 <td>{{ $item->product_name }}</td>
                 <td>{{ number_format($item->price, 2) }} $</td>
-                <td>{{ $item->quantity }}</td>
-                <td>{{ number_format($item->price * $item->quantity, 2) }} $</td>
             </tr>
             @endforeach
             </tbody>
             <tfoot>
-                <tr><td colspan="3" class="text-end fw-bold">المجموع:</td>
+                <tr><td class="text-end fw-bold">المجموع:</td>
                 <td class="fw-bold text-success">{{ number_format($order->total, 2) }} $</td></tr>
             </tfoot>
         </table>

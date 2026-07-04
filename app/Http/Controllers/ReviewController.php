@@ -8,13 +8,11 @@ class ReviewController extends Controller
 {
     public function store(Request $request, Product $product)
     {
-        // لازم يكون مسجّل
         if (!auth()->check()) {
             return redirect()->route('login')
-                             ->with('error', 'سجّل دخول أولاً لتتمكن من التقييم');
+                             ->with('error', __('shop.review_login_required'));
         }
 
-        // تحقق إذا اشترى المنتج
         $purchased = auth()->user()
             ->orders()
             ->whereHas('items', fn($q) => $q->where('product_id', $product->id))
@@ -22,17 +20,16 @@ class ReviewController extends Controller
 
         if (!$purchased) {
             return redirect()->back()
-                             ->with('error', 'يمكنك التقييم فقط بعد شراء هذا المنتج');
+                             ->with('error', __('shop.review_must_purchase_first'));
         }
 
-        // تحقق إذا قيّم مسبقاً
         $exists = Review::where('product_id', $product->id)
                         ->where('user_id', auth()->id())
                         ->exists();
 
         if ($exists) {
             return redirect()->back()
-                             ->with('error', 'لقد قيّمت هذا المنتج مسبقاً');
+                             ->with('error', __('shop.review_already_submitted'));
         }
 
         $request->validate([
@@ -48,14 +45,13 @@ class ReviewController extends Controller
             'approved'   => true,
         ]);
 
-        return redirect()->back()->with('success', 'شكراً! تم إضافة تقييمك بنجاح ⭐');
+        return redirect()->back()->with('success', __('shop.review_added_success'));
     }
 
     public function destroy(Review $review)
     {
-        // العميل يحذف تقييمه فقط
         if ($review->user_id !== auth()->id()) abort(403);
         $review->delete();
-        return redirect()->back()->with('success', 'تم حذف تقييمك');
+        return redirect()->back()->with('success', __('shop.review_deleted'));
     }
 }

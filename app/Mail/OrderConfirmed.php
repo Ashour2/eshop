@@ -17,7 +17,7 @@ class OrderConfirmed extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '✅ تم تأكيد طلبك رقم #' . $this->order->id . ' — متجرنا الإلكتروني',
+            subject: '✅ تم تأكيد طلبك رقم #' . $this->order->id . ' — RoyaTech',
         );
     }
 

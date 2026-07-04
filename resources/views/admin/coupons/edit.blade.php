@@ -1,8 +1,8 @@
 @extends('layouts.admin')
-@section('title', 'تعديل كوبون')
+@section('title', 'تعديل خصم')
 @section('content')
 
-<h3 class="fw-bold mb-4">✏️ تعديل كوبون: {{ $coupon->code }}</h3>
+<h3 class="fw-bold mb-4">✏️ تعديل خصم: {{ $coupon->code }}</h3>
 
 <div class="card shadow-sm border-0 rounded-4">
 <div class="card-body p-4">
@@ -11,7 +11,7 @@
     <div class="row g-3">
 
         <div class="col-md-6">
-            <label class="form-label fw-bold">كود الكوبون</label>
+            <label class="form-label fw-bold">كود الخصم</label>
             <input type="text" name="code"
                    class="form-control text-uppercase @error('code') is-invalid @enderror"
                    value="{{ old('code', $coupon->code) }}"
@@ -63,7 +63,7 @@
                 <input type="checkbox" name="active" value="1"
                        class="form-check-input" id="active"
                        {{ $coupon->active ? 'checked' : '' }}>
-                <label class="form-check-label" for="active">كوبون مفعّل</label>
+                <label class="form-check-label" for="active">خصم مفعّل</label>
             </div>
         </div>
 

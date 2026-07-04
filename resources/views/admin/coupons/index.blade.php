@@ -1,11 +1,11 @@
 @extends('layouts.admin')
-@section('title', 'الكوبونات')
+@section('title', 'الخصومات')
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold">🎟️ الكوبونات</h3>
+    <h3 class="fw-bold">🎟️ الخصومات</h3>
     <a href="{{ route('admin.coupons.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-lg"></i> إضافة كوبون
+        <i class="bi bi-plus-lg"></i> إضافة خصم
     </a>
 </div>
 
@@ -60,7 +60,7 @@
                 <a href="{{ route('admin.coupons.edit', $coupon) }}"
                    class="btn btn-sm btn-outline-primary">تعديل</a>
                 <form action="{{ route('admin.coupons.destroy', $coupon) }}" method="POST"
-                      class="d-inline" onsubmit="return confirm('هل تريد حذف هذا الكوبون؟')">
+                      class="d-inline" onsubmit="return confirm('هل تريد حذف هذا الخصم؟')">
                     @csrf @method('DELETE')
                     <button class="btn btn-sm btn-outline-danger">حذف</button>
                 </form>
@@ -68,7 +68,7 @@
         </tr>
         @empty
         <tr>
-            <td colspan="8" class="text-center text-muted py-4">لا توجد كوبونات</td>
+            <td colspan="8" class="text-center text-muted py-4">لا توجد خصومات</td>
         </tr>
         @endforelse
         </tbody>

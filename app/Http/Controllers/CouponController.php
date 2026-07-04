@@ -14,7 +14,7 @@ class CouponController extends Controller
         $coupon = Coupon::where('code', strtoupper($request->code))->first();
 
         if (!$coupon) {
-            return response()->json(['valid' => false, 'message' => 'الكوبون غير موجود']);
+            return response()->json(['valid' => false, 'message' => __('shop.coupon_invalid')]);
         }
 
         $check = $coupon->isValid((float) $request->total);

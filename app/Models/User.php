@@ -25,6 +25,14 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function wallet() {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function redeemedCodes() {
+        return $this->hasMany(RedeemCode::class, 'used_by');
+    }
+
     public function wishlist() {
         return $this->hasMany(Wishlist::class);
     }

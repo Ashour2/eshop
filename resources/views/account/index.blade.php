@@ -1,10 +1,9 @@
 @extends('layouts.app')
-@section('title', 'حسابي')
+@section('title', __('shop.my_account'))
 @section('content')
 
 <div class="row g-4">
 
-    {{-- ── الشريط الجانبي ─────────────────────────────── --}}
     <div class="col-md-3">
         <div class="card border-0 shadow-sm rounded-4 text-center p-4 mb-3">
             <div class="mx-auto mb-3 rounded-circle bg-primary d-flex align-items-center justify-content-center"
@@ -18,30 +17,28 @@
         <div class="list-group shadow-sm rounded-4 overflow-hidden">
             <a href="{{ route('account.index') }}"
                class="list-group-item list-group-item-action active fw-bold">
-                <i class="bi bi-person me-2"></i> حسابي
+                <i class="bi bi-person me-2"></i> {{ __('shop.my_account') }}
             </a>
             <a href="{{ route('account.orders') }}"
                class="list-group-item list-group-item-action">
-                <i class="bi bi-receipt me-2"></i> طلباتي
+                <i class="bi bi-receipt me-2"></i> {{ __('shop.my_orders') }}
                 <span class="badge bg-primary float-start">{{ $orders_count }}</span>
             </a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button class="list-group-item list-group-item-action text-danger border-0 w-100 text-start">
-                    <i class="bi bi-box-arrow-left me-2"></i> تسجيل الخروج
+                    <i class="bi bi-box-arrow-left me-2"></i> {{ __('shop.logout') }}
                 </button>
             </form>
         </div>
     </div>
 
-    {{-- ── المحتوى الرئيسي ─────────────────────────────── --}}
     <div class="col-md-9">
 
-        {{-- إحصائيات سريعة --}}
         <div class="row g-3 mb-4">
             @foreach([
-                ['icon'=>'bi-receipt',    'color'=>'primary', 'val'=>$orders_count,                         'lbl'=>'إجمالي الطلبات'],
-                ['icon'=>'bi-cash-stack', 'color'=>'success', 'val'=>'$'.number_format($total_spent, 2),    'lbl'=>'إجمالي الإنفاق'],
+                ['icon'=>'bi-receipt',    'color'=>'primary', 'val'=>$orders_count,                         'lbl'=>__('shop.total_orders')],
+                ['icon'=>'bi-cash-stack', 'color'=>'success', 'val'=>'$'.number_format($total_spent, 2),    'lbl'=>__('shop.total_spent')],
             ] as $s)
             <div class="col-sm-6">
                 <div class="card border-0 shadow-sm rounded-4">
@@ -59,30 +56,29 @@
             @endforeach
         </div>
 
-        {{-- تعديل البيانات --}}
         <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-header bg-transparent fw-bold border-0 pt-4 px-4">
-                <i class="bi bi-pencil-square me-2"></i> تعديل البيانات الشخصية
+                <i class="bi bi-pencil-square me-2"></i> {{ __('shop.edit_profile') }}
             </div>
             <div class="card-body px-4 pb-4">
                 <form action="{{ route('account.update') }}" method="POST">
                     @csrf @method('PUT')
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">الاسم</label>
+                            <label class="form-label">{{ __('shop.name') }}</label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                    value="{{ old('name', $user->name) }}" required>
                             @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">البريد الإلكتروني</label>
+                            <label class="form-label">{{ __('shop.email') }}</label>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                    value="{{ old('email', $user->email) }}" required>
                             @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> حفظ التغييرات
+                                <i class="bi bi-save"></i> {{ __('shop.save_changes') }}
                             </button>
                         </div>
                     </div>
@@ -90,34 +86,33 @@
             </div>
         </div>
 
-        {{-- تغيير كلمة المرور --}}
         <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-header bg-transparent fw-bold border-0 pt-4 px-4">
-                <i class="bi bi-lock me-2"></i> تغيير كلمة المرور
+                <i class="bi bi-lock me-2"></i> {{ __('shop.change_password') }}
             </div>
             <div class="card-body px-4 pb-4">
                 <form action="{{ route('account.password') }}" method="POST">
                     @csrf @method('PUT')
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label">كلمة المرور الحالية</label>
+                            <label class="form-label">{{ __('shop.current_password') }}</label>
                             <input type="password" name="current_password"
                                    class="form-control @error('current_password') is-invalid @enderror">
                             @error('current_password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">كلمة المرور الجديدة</label>
+                            <label class="form-label">{{ __('shop.new_password') }}</label>
                             <input type="password" name="password"
                                    class="form-control @error('password') is-invalid @enderror">
                             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">تأكيد كلمة المرور</label>
+                            <label class="form-label">{{ __('shop.confirm_password') }}</label>
                             <input type="password" name="password_confirmation" class="form-control">
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-warning">
-                                <i class="bi bi-shield-lock"></i> تغيير كلمة المرور
+                                <i class="bi bi-shield-lock"></i> {{ __('shop.change_password') }}
                             </button>
                         </div>
                     </div>
@@ -125,12 +120,11 @@
             </div>
         </div>
 
-        {{-- آخر الطلبات --}}
         @if($recent_orders->count())
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-header bg-transparent fw-bold border-0 pt-4 px-4 d-flex justify-content-between">
-                <span><i class="bi bi-clock-history me-2"></i> آخر الطلبات</span>
-                <a href="{{ route('account.orders') }}" class="btn btn-sm btn-outline-primary">عرض الكل</a>
+                <span><i class="bi bi-clock-history me-2"></i> {{ __('shop.recent_orders') }}</span>
+                <a href="{{ route('account.orders') }}" class="btn btn-sm btn-outline-primary">{{ __('shop.view_all') }}</a>
             </div>
             <div class="card-body px-4 pb-4">
                 @foreach($recent_orders as $order)
@@ -142,7 +136,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-success fw-bold">${{ number_format($order->total, 2) }}</span>
                         <span class="badge bg-{{ $order->status_color }}">{{ $order->status_label }}</span>
-                        <a href="{{ route('account.orders.show', $order->id) }}" class="btn btn-sm btn-outline-dark">تفاصيل</a>
+                        <a href="{{ route('account.orders.show', $order->id) }}" class="btn btn-sm btn-outline-dark">{{ __('shop.details') }}</a>
                     </div>
                 </div>
                 @endforeach
